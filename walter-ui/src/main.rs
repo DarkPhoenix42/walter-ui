@@ -22,7 +22,7 @@ use walter_core::migrator::migrate_files;
 use walter_core::updater;
 use walter_db;
 
-use clipboard::ClipboardProvider;
+use clipboard::{ClipboardContext, ClipboardProvider};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -227,7 +227,12 @@ async fn run_app(
                     _ => {}
                 },
                 CurrentScreen::Dashboard => match key.code {
-                    KeyCode::Char('c') => {}
+                    KeyCode::Char('c') | KeyCode::Char('C') => {
+                        let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+                        let selected_index = app.table_state.selected().unwrap_or(0);
+                        ctx.set_contents(app.user_blobs[selected_index].blob_id.clone())
+                            .unwrap();
+                    }
                     KeyCode::Up => {
                         app.prev_row();
                     }
@@ -261,6 +266,8 @@ async fn run_app(
                     }
                     KeyCode::Enter => {
                         app.migration_status = "Uploading file...".into();
+                        terminal.draw(|frame| render_ui(frame, app))?;
+
                         let res = upload_blob(&app.filename, app.epochs).await;
                         match res {
                             Ok(blob_id) => {
@@ -280,7 +287,8 @@ async fn run_app(
                 },
                 CurrentScreen::Migrator => match key.code {
                     KeyCode::Char('P') | KeyCode::Char('p') => {
-                        let mut ctx: clipboard::ClipboardContext = ClipboardProvider::new().unwrap();
+                        let mut ctx: clipboard::ClipboardContext =
+                            ClipboardProvider::new().unwrap();
                         app.pinata_api_key = ctx.get_contents().unwrap();
                     }
                     KeyCode::Char('x') => {
@@ -288,6 +296,8 @@ async fn run_app(
                     }
                     KeyCode::Char('M') | KeyCode::Char('m') => {
                         app.migration_status = "Migrating files...".into();
+                        terminal.draw(|frame| render_ui(frame, app))?;
+
                         let res = migrate_files(&app.pinata_api_key).await;
                         match res {
                             Ok(_) => {
@@ -309,6 +319,8 @@ async fn run_app(
                             app.filename += &key.code.to_string();
                         } else {
                             app.sharder_status = "Sharding Started...".into();
+                            terminal.draw(|frame| render_ui(frame, app))?;
+
                             let status = app.upload_shard().await;
                             app.sharder_status = status;
                         }
@@ -330,12 +342,13 @@ async fn run_app(
                             app.extender_status = status;
                         }
                     }
-                    KeyCode::Char('V') | KeyCode::Char('v') => {
+                    KeyCode::Char('P') | KeyCode::Char('p') => {
                         if app.is_editing {
                             app.filename += &key.code.to_string();
                         } else {
-                            app.extender_blob_id =
-                                "A7Zy48JtR7Qid2V5eGhTizqzYjnooEE3Thi_RtTStOU".into();
+                            let mut ctx: clipboard::ClipboardContext =
+                                ClipboardProvider::new().unwrap();
+                            app.extender_blob_id = ctx.get_contents().unwrap();
                         }
                     }
                     KeyCode::Char(value) => {
