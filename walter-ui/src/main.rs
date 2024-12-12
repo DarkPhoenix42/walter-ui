@@ -22,6 +22,8 @@ use walter_core::migrator::migrate_files;
 use walter_core::updater;
 use walter_db;
 
+use clipboard::ClipboardProvider;
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = std::env::args().collect();
@@ -258,6 +260,7 @@ async fn run_app(
                         }
                     }
                     KeyCode::Enter => {
+                        app.migration_status = "Uploading file...".into();
                         let res = upload_blob(&app.filename, app.epochs).await;
                         match res {
                             Ok(blob_id) => {
@@ -276,15 +279,16 @@ async fn run_app(
                     _ => {}
                 },
                 CurrentScreen::Migrator => match key.code {
-                    KeyCode::Char('v') | KeyCode::Char('V') => {
-                        app.pinata_api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI4YzAxZGVjYy1iZmFiLTQ4Y2UtOTQyMy05NjJkMWNkYjlhODYiLCJlbWFpbCI6InByYW5lZXRoc2Fyb2RlQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiJmOTg4MzJhZDZkZmI0Mzk0NWM3MyIsInNjb3BlZEtleVNlY3JldCI6IjhlMTE3NTFlMjE2ZTczYWI4MWIxYWQ5NDkwYjliYWYyN2RiNDVhNjU3NzQzNzVhZTNjMzI2N2U4NDMzODBhNDUiLCJleHAiOjE3NjUxMTQ2OTF9.Gl5_t61lvIF4jds9ZNnXiEZdE_O4E9_imFeuYPiJqEE".into();
+                    KeyCode::Char('P') | KeyCode::Char('p') => {
+                        let mut ctx: clipboard::ClipboardContext = ClipboardProvider::new().unwrap();
+                        app.pinata_api_key = ctx.get_contents().unwrap();
                     }
                     KeyCode::Char('x') => {
                         app.pinata_api_key = "".into();
                     }
                     KeyCode::Char('M') | KeyCode::Char('m') => {
-                        let res = migrate_files(&app.pinata_api_key).await;
                         app.migration_status = "Migrating files...".into();
+                        let res = migrate_files(&app.pinata_api_key).await;
                         match res {
                             Ok(_) => {
                                 app.migration_status = "Migration successful".into();
@@ -304,7 +308,7 @@ async fn run_app(
                         if app.is_editing {
                             app.filename += &key.code.to_string();
                         } else {
-                            app.sharder_status = "Sharding Started".into();
+                            app.sharder_status = "Sharding Started...".into();
                             let status = app.upload_shard().await;
                             app.sharder_status = status;
                         }
