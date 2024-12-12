@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-
+#[allow(non_snake_case)]
 pub struct AlreadyCertified {
     pub blobId: String,
     pub endEpoch: u32,
@@ -14,12 +14,13 @@ pub enum EventOrObject {
     Object,
 }
 
+#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NewlyCreated {
     pub blobObject: BlobObject,
     pub cost: u64,
 }
-
+#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BlobObject {
     pub blobId: String,
@@ -30,8 +31,7 @@ pub struct BlobObject {
     pub registeredEpoch: u32,
     pub size: u64,
 }
-
-
+#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BlobResponse {
     pub content: Vec<BlobEntry>,
@@ -46,7 +46,7 @@ pub struct BlobResponse {
     pub first: bool,
     pub empty: bool,
 }
-
+#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BlobEntry {
     pub blobId: String,
@@ -57,7 +57,7 @@ pub struct BlobEntry {
     pub size: u64,
     pub timestamp: u64,
 }
-
+#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Pageable {
     pub pageNumber: u32,
@@ -67,7 +67,7 @@ pub struct Pageable {
     pub paged: bool,
     pub unpaged: bool,
 }
-
+#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Sort {
     pub sorted: bool,

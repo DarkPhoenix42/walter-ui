@@ -3,8 +3,8 @@ use ratatui::{
     style::{Color, Modifier, Style, Stylize},
     text::{Line, Span, Text},
     widgets::{
-        Block, BorderType, Borders, Cell, Clear, HighlightSpacing, Padding, Paragraph, Row,
-        Scrollbar, ScrollbarOrientation, Table, Wrap,
+        Block, BorderType, Borders, Cell, Clear, Padding, Paragraph, Row, Scrollbar,
+        ScrollbarOrientation, Table, Wrap,
     },
     Frame,
 };

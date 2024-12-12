@@ -1,6 +1,6 @@
 use ratatui::widgets::{ScrollbarState, TableState};
 
-use walter_core::client::{download_blob, upload_blob, WalrusClient};
+use walter_core::client::{download_blob, WalrusClient};
 use walter_core::config::WalterConfig;
 use walter_core::epoch_extender::extend_epoch;
 use walter_core::types::BlobInfo;
@@ -93,15 +93,6 @@ impl App {
             };
             self.table_state.select(Some(i));
             self.scrollbar_state = self.scrollbar_state.position(i);
-        }
-    }
-
-    pub async fn upload_file(&mut self) -> String {
-        let result = upload_blob(&self.filename, self.epochs).await;
-
-        match result {
-            Ok(b) => "success".to_string(),
-            Err(e) => "failure".to_string(),
         }
     }
 

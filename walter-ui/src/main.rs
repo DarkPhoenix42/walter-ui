@@ -17,7 +17,7 @@ use std::{
     io::{self, Stdout},
 };
 use ui::render_ui;
-use walter_core::client::{download_blob, upload_blob};
+use walter_core::client::upload_blob;
 use walter_core::migrator::migrate_files;
 use walter_core::updater;
 use walter_db;
