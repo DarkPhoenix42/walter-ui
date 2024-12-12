@@ -537,14 +537,14 @@ fn render_footer(frame: &mut Frame, app: &mut App, area: Rect) {
     let sharder_str = if app.is_editing {
         format!("[1] Dashboard | [2] Uploader | [3] Migrator | [K] Shard | Encr[Y]pt | Epoch Ex[T]end | [ESC] Exit Edit Mode | [Q]uit")
     } else {
-        format!("[1] Dashboard | [2] Uploader | [3] Migrator | [K] Shard | Encr[Y]pt | Epoch Ex[T]end | [E]dit Mode | [Q]uit")
+        format!("[1] Dashboard | [2] Uploader | [3] Migrator | [K] Shard | Encr[Y]pt | [P]aste Blob ID | Epoch Ex[T]end | [E]dit Mode | [Q]uit")
     };
 
     let content = match app.current_screen {
         CurrentScreen::Splash => "Press 'Enter' to continue",
-        CurrentScreen::Dashboard => "[2] Uploader | [3] Migrate | [4] Sharder & Epoch Extender | [Q]uit",
+        CurrentScreen::Dashboard => "[C]opy Blob ID | [2] Uploader | [3] Migrate | [4] Sharder & Epoch Extender | [Q]uit",
         CurrentScreen::Uploader => &uploader_str,
-        CurrentScreen::Migrator => "[1] Dashboard | [2] Uploader | [P] Paste Key | [M]igrate | [4] Sharder & Epoch Extender | [Q]uit",
+        CurrentScreen::Migrator => "[1] Dashboard | [2] Uploader | [P]aste Key | [M]igrate | [4] Sharder & Epoch Extender | [Q]uit",
         CurrentScreen::SharderAndEpochExtender => &sharder_str,
     };
 
