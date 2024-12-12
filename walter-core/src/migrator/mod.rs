@@ -1,6 +1,5 @@
 use crate::client::WalrusClient;
 use crate::config::WalterConfig;
-use failure;
 use reqwest::Client;
 use std::error::Error;
 use std::fs::write as write_file;
@@ -8,7 +7,7 @@ use std::path;
 
 const PINATA_URL: &str = "https://api.pinata.cloud/v3/";
 
-pub async fn get_file_list(jwt: &str) -> Result<serde_json::Value, failure::Error> {
+pub async fn get_file_list(jwt: &str) -> Result<serde_json::Value, Box<dyn Error>> {
     let client = Client::new();
 
     let response = client
@@ -22,7 +21,7 @@ pub async fn get_file_list(jwt: &str) -> Result<serde_json::Value, failure::Erro
     Ok(response)
 }
 
-pub async fn download_ipfs_file(file_path: &str, cid: &str) -> Result<(), failure::Error> {
+pub async fn download_ipfs_file(file_path: &str, cid: &str) -> Result<(), Box<dyn Error>> {
     let url = format!("https://ipfs.io/ipfs/{}", cid);
     let client = reqwest::Client::new();
     let response = client.get(&url).send().await?;
@@ -33,6 +32,10 @@ pub async fn download_ipfs_file(file_path: &str, cid: &str) -> Result<(), failur
 
 pub async fn migrate_files(jwt: &str) -> Result<(), Box<dyn Error>> {
     let files = get_file_list(jwt).await?;
+
+    if !files.get("data").is_some() {
+        return Err("Invalid API key.".into());
+    }
 
     let config: WalterConfig = WalterConfig::load_config_file();
     let default_file_download_dir = config.get_default_file_download_dir();
@@ -63,7 +66,6 @@ mod tests {
 
     use super::*;
     const JWT : &str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI4YzAxZGVjYy1iZmFiLTQ4Y2UtOTQyMy05NjJkMWNkYjlhODYiLCJlbWFpbCI6InByYW5lZXRoc2Fyb2RlQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiJmOTg4MzJhZDZkZmI0Mzk0NWM3MyIsInNjb3BlZEtleVNlY3JldCI6IjhlMTE3NTFlMjE2ZTczYWI4MWIxYWQ5NDkwYjliYWYyN2RiNDVhNjU3NzQzNzVhZTNjMzI2N2U4NDMzODBhNDUiLCJleHAiOjE3NjUxMTQ2OTF9.Gl5_t61lvIF4jds9ZNnXiEZdE_O4E9_imFeuYPiJqEE";
-
     #[tokio::test]
     async fn test_migration() {
         let result = migrate_files(JWT).await;
