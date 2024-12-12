@@ -338,6 +338,9 @@ async fn run_app(
                         if app.is_editing {
                             app.filename += &key.code.to_string();
                         } else {
+                            app.sharder_status = "Extending Epoch...".into();
+                            terminal.draw(|frame| render_ui(frame, app))?;
+
                             let status = app.extend_blob_epoch().await;
                             app.extender_status = status;
                         }
