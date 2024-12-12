@@ -27,6 +27,7 @@ pub struct App {
 
     pub filename: String,
     pub pinata_api_key: String,
+    pub shard_encrypting: bool,
     pub shard_pass: String,
     pub extender_blob_id: String,
     pub walrus_client: WalrusClient,
@@ -61,6 +62,7 @@ impl App {
             extender_status: String::new(),
             migration_status: String::new(),
             epochs: 1,
+            shard_encrypting: false,
         }
     }
     pub fn next_row(&mut self) {
