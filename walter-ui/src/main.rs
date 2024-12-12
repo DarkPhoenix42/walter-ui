@@ -178,7 +178,7 @@ async fn run_app(
                     }
                 }
 
-                if !app.should_quit {
+                if !app.should_quit && !app.is_editing {
                     match key.code {
                         KeyCode::Char('q') => app.should_quit = true,
                         _ => {}
@@ -195,18 +195,22 @@ async fn run_app(
 
                 if key.code == KeyCode::Char('1') {
                     app.current_screen = CurrentScreen::Dashboard;
+                    app.is_editing = false;
                 }
 
                 if key.code == KeyCode::Char('2') {
                     app.current_screen = CurrentScreen::Uploader;
+                    app.is_editing = false;
                 }
 
                 if key.code == KeyCode::Char('3') {
                     app.current_screen = CurrentScreen::Migrator;
+                    app.is_editing = false;
                 }
 
                 if key.code == KeyCode::Char('4') {
                     app.current_screen = CurrentScreen::SharderAndEpochExtender;
+                    app.is_editing = false;
                 }
             }
 
@@ -257,7 +261,11 @@ async fn run_app(
                         let res = upload_blob(&app.filename, app.epochs).await;
                         match res {
                             Ok(blob_id) => {
-                                app.file_upload_status = "File uploaded successfully!".to_string();
+                                app.file_upload_status =
+                                    format!("File uploaded successfully! Blob ID {}", blob_id);
+                                let user_blobs = utils::walrus_list_blobs().await.unwrap();
+                                let user_blobs = serde_json::from_str(&user_blobs).unwrap();
+                                app.user_blobs = user_blobs;
                             }
                             Err(e) => {
                                 app.file_upload_status =
@@ -276,9 +284,13 @@ async fn run_app(
                     }
                     KeyCode::Char('M') | KeyCode::Char('m') => {
                         let res = migrate_files(&app.pinata_api_key).await;
+                        app.migration_status = "Migrating files...".into();
                         match res {
                             Ok(_) => {
                                 app.migration_status = "Migration successful".into();
+                                let user_blobs = utils::walrus_list_blobs().await.unwrap();
+                                let user_blobs = serde_json::from_str(&user_blobs).unwrap();
+                                app.user_blobs = user_blobs;
                             }
                             Err(e) => {
                                 app.migration_status = format!("Migration failed: {}", e);
@@ -289,20 +301,38 @@ async fn run_app(
                 },
                 CurrentScreen::SharderAndEpochExtender => match key.code {
                     KeyCode::Char('K') | KeyCode::Char('k') => {
-                        let status = app.upload_shard().await;
-                        app.sharder_status = status;
+                        if app.is_editing {
+                            app.filename += &key.code.to_string();
+                        } else {
+                            app.sharder_status = "Sharding Started".into();
+                            let status = app.upload_shard().await;
+                            app.sharder_status = status;
+                        }
                     }
                     KeyCode::Char('Y') | KeyCode::Char('y') => {
-                        app.shard_pass = "password".into();
-                        let status = app.upload_shard().await;
-                        app.sharder_status = status;
+                        if app.is_editing {
+                            app.filename += &key.code.to_string();
+                        } else {
+                            app.shard_pass = "password".into();
+                            let status = app.upload_shard().await;
+                            app.sharder_status = status;
+                        }
                     }
                     KeyCode::Char('T') | KeyCode::Char('t') => {
-                        let status = app.extend_blob_epoch().await;
-                        app.extender_status = status;
+                        if app.is_editing {
+                            app.filename += &key.code.to_string();
+                        } else {
+                            let status = app.extend_blob_epoch().await;
+                            app.extender_status = status;
+                        }
                     }
                     KeyCode::Char('V') | KeyCode::Char('v') => {
-                        app.extender_blob_id = "A7Zy48JtR7Qid2V5eGhTizqzYjnooEE3Thi_RtTStOU".into();
+                        if app.is_editing {
+                            app.filename += &key.code.to_string();
+                        } else {
+                            app.extender_blob_id =
+                                "A7Zy48JtR7Qid2V5eGhTizqzYjnooEE3Thi_RtTStOU".into();
+                        }
                     }
                     KeyCode::Char(value) => {
                         if app.is_editing {
