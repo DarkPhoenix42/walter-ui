@@ -33,21 +33,27 @@ WalTer-UI is a **terminal-based** Devtool toolchain built on Rust. It leverages 
     ```bash
     git clone https://github.com/EthIndia2024IITR/walter-ui.git
     ```
+2.  Install required libraries
 
-2.  Install from Makefile:
+    - For Ubuntu (use equivalents on other package managers and distributions)
+    ```bash
+    sudo apt install libssl-dev libsqlite3-dev libxcb-xfixes0-dev
+    ```
+
+3.  Install from Makefile:
 
     ```bash
     cd walter-ui;
     ```
 
-3.  Run the project:
+4.  Run the project:
 
     ```bash
     cargo build && cargo run
 
     ```
 
-4.  You can access the CLI by using the --help flag
+5.  You can access the CLI by using the --help flag
 
 ## Instructions
 
