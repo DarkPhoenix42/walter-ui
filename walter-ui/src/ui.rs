@@ -544,7 +544,7 @@ fn render_footer(frame: &mut Frame, app: &mut App, area: Rect) {
         CurrentScreen::Splash => "Press 'Enter' to continue",
         CurrentScreen::Dashboard => "[2] Uploader | [3] Migrate | [4] Sharder & Epoch Extender | [Q]uit",
         CurrentScreen::Uploader => &uploader_str,
-        CurrentScreen::Migrator => "[1] Dashboard | [2] Uploader | [M]igrate | [4] Sharder & Epoch Extender | [Q]uit",
+        CurrentScreen::Migrator => "[1] Dashboard | [2] Uploader | [P] Paste Key | [M]igrate | [4] Sharder & Epoch Extender | [Q]uit",
         CurrentScreen::SharderAndEpochExtender => &sharder_str,
     };
 
