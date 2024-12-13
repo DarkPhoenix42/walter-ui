@@ -10,7 +10,7 @@ pub fn main() -> anyhow::Result<()> {
         std::process::exit(1);
     }
     std::fs::File::create("/tmp/sqlite.db").expect("Unable to create file");
-    let blob_id = &args[1];
+    let blob_id = &args[2];
     let blob_id = blob_id.to_string();
     let mut blob_id =
         match walrus_io::download_and_extract_id(blob_id.clone(), "/tmp/sqlite.db".to_string()) {
@@ -68,6 +68,8 @@ fn print_help() {
     println!("  describe <table> - Show table schema");
     println!("  SQL queries will be executed");
     println!("  exit/quit - Close the shell");
+    println!("  SAVE - Saves the current state of the database an returns blob_id");
+    println!("  ROLLBACK - provides blob_id of the previous state of the database");
 }
 
 fn list_tables(conn: &Connection) -> Result<()> {
