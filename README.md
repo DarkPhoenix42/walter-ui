@@ -43,7 +43,7 @@ WalTer-UI is a **terminal-based** Devtool toolchain built on Rust. It leverages 
 3.  Install from Makefile:
 
     ```bash
-    cd walter-ui;
+    cd walter-ui
     ```
 
 4.  Run the project:
@@ -79,7 +79,13 @@ Updates Walter and its dependencies.
 
 Runs the Walrus SQLite shell with rollbacks. Requires `blobID` as an argument.
 
--
+### `--build-site` | `-bs`
+
+Builds a site using the Walrus Site Builder. A path is required as an argument.
+
+### `--run-pinner` | `-rp`
+
+Runs the Walrus HTTP Pinning service in the background.
 
 ### 1. Splash Screen
 
